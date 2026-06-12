@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* offset for the sticky top nav when jumping to anchors */
+  scroll-padding-top: 5rem;
+}
+
+body {
+  @apply bg-ink text-white/90 font-body antialiased;
+}
+
+@layer utilities {
+  .bg-aurora {
+    background-image:
+      radial-gradient(40rem 40rem at 10% -10%, rgba(124, 92, 255, 0.25), transparent 60%),
+      radial-gradient(35rem 35rem at 110% 10%, rgba(37, 211, 102, 0.22), transparent 55%),
+      radial-gradient(30rem 30rem at 50% 120%, rgba(255, 107, 107, 0.18), transparent 60%);
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(120deg, #25D366, #7C5CFF 45%, #FFC93C);
+    background-size: 200% 200%;
+  }
+}

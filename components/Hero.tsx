@@ -1,0 +1,69 @@
+import Badge from "@/components/ui/Badge";
+
+export default function Hero() {
+  return (
+    <section
+      id="home"
+      className="relative overflow-hidden bg-aurora"
+    >
+      <div className="mx-auto max-w-5xl px-4 pb-16 pt-12 sm:px-6 sm:pb-24 sm:pt-20">
+        <div className="flex flex-col items-center text-center">
+          <Badge tone="grape">🌍 Friends across the globe</Badge>
+
+          <h1 className="mt-5 font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-6xl">
+            Welcome to{" "}
+            <span className="text-gradient animate-shimmer">Friends Community</span>
+          </h1>
+
+          <p className="mt-4 max-w-xl text-balance text-base text-white/70 sm:text-lg">
+            One crew, scattered everywhere, united by good banter. Make your
+            predictions, rate the movies, and settle who really has the best
+            takes. 🏆
+          </p>
+
+          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+            <a
+              href="#active-contests"
+              className="rounded-full bg-brand-green px-6 py-3 text-center font-semibold text-ink shadow-pop transition hover:brightness-110"
+            >
+              See active contests ⚽
+            </a>
+            <a
+              href="#movie-ratings"
+              className="rounded-full border border-white/15 bg-white/5 px-6 py-3 text-center font-semibold text-white transition hover:bg-white/10"
+            >
+              Movie verdicts 🍿
+            </a>
+          </div>
+
+          {/* Fun floating stat chips set the social tone without external images */}
+          <div className="mt-12 grid w-full max-w-md grid-cols-3 gap-3 sm:gap-4">
+            <Stat emoji="👥" value="20+" label="Friends" />
+            <Stat emoji="🎯" value="5" label="Contests" />
+            <Stat emoji="🎬" value="40+" label="Movies rated" />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Stat({
+  emoji,
+  value,
+  label,
+}: {
+  emoji: string;
+  value: string;
+  label: string;
+}) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-2 py-4 text-center backdrop-blur-sm">
+      <div className="text-2xl animate-floaty">{emoji}</div>
+      <div className="mt-1 font-display text-xl font-extrabold text-white">
+        {value}
+      </div>
+      <div className="text-xs font-medium text-white/60">{label}</div>
+    </div>
+  );
+}
