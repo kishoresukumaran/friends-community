@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useAuth } from "@/components/PasswordGate";
 
 const links = [
   { href: "#home", label: "Home" },
@@ -11,6 +12,7 @@ const links = [
 
 export default function Nav() {
   const [open, setOpen] = useState(false);
+  const { unlocked, logout } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-ink/80 backdrop-blur-md">
@@ -36,6 +38,17 @@ export default function Nav() {
               </a>
             </li>
           ))}
+          {unlocked && (
+            <li>
+              <button
+                type="button"
+                onClick={logout}
+                className="ml-1 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 transition hover:border-sunset/40 hover:bg-sunset/10 hover:text-white"
+              >
+                Logout
+              </button>
+            </li>
+          )}
         </ul>
 
         {/* Mobile hamburger */}
@@ -84,6 +97,20 @@ export default function Nav() {
               </a>
             </li>
           ))}
+          {unlocked && (
+            <li>
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  logout();
+                }}
+                className="mt-1 block w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-left text-base font-semibold text-white/80 transition hover:border-sunset/40 hover:bg-sunset/10 hover:text-white"
+              >
+                Logout
+              </button>
+            </li>
+          )}
         </ul>
       </div>
     </header>

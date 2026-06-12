@@ -32,3 +32,9 @@ next-env.d.ts
 
 # vercel
 .vercel
+
+# local data exports (contain members' personal info)
+/Google_sheet
+
+# local data exports (contain personal info — keep out of git)
+/Google_sheet

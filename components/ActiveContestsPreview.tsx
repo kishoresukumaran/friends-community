@@ -1,9 +1,15 @@
 import SectionHeading from "@/components/SectionHeading";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
-import { activeContests, archivedContests } from "@/lib/data";
+import { Contest } from "@/lib/types";
 
-export default function ActiveContestsPreview() {
+export default function ActiveContestsPreview({
+  active,
+  archived,
+}: {
+  active: Contest[];
+  archived: Contest[];
+}) {
   return (
     <section id="active-contests" className="mx-auto max-w-5xl px-4 py-14 sm:px-6 sm:py-20">
       <SectionHeading
@@ -17,7 +23,7 @@ export default function ActiveContestsPreview() {
       />
 
       <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
-        {activeContests.map((contest) => (
+        {active.map((contest) => (
           <Card key={contest.id} className="sm:col-span-2">
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3">
@@ -59,7 +65,7 @@ export default function ActiveContestsPreview() {
         ))}
 
         {/* Teaser link to the archive section */}
-        {archivedContests.map((past) => (
+        {archived.map((past) => (
           <Card key={past.id} className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <span className="grid h-11 w-11 place-items-center rounded-xl bg-white/5 text-2xl">

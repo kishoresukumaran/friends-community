@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans, Outfit } from "next/font/google";
 import "./globals.css";
 import Nav from "@/components/Nav";
+import PasswordGate from "@/components/PasswordGate";
 
 const display = Outfit({
   subsets: ["latin"],
@@ -35,8 +36,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${display.variable} ${body.variable}`}>
       <body className="min-h-dvh bg-ink">
-        <Nav />
-        {children}
+        <PasswordGate>
+          <Nav />
+          {children}
+        </PasswordGate>
       </body>
     </html>
   );

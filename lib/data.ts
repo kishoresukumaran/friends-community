@@ -1,34 +1,21 @@
-// Hardcoded placeholder data for Step 1 (landing page).
-// Structured so it can later be swapped for MongoDB Atlas documents.
+// Seed + fallback data. Used to populate MongoDB (see scripts/seed.mjs) and to
+// keep the public page rendering if the database is empty or unreachable.
 
-export type ContestStatus = "live" | "upcoming" | "archived";
+import { Contest, Movie } from "./types";
+import { computeStats } from "./util";
 
-export type Contest = {
-  id: string;
-  title: string;
-  emoji: string;
-  status: ContestStatus;
-  participants: number;
-  // Days until the contest closes (only meaningful for live/upcoming).
-  daysLeft?: number;
-  // Short teaser about who's on top.
-  leaderTeaser?: string;
-  // For archived contests, who took the crown.
-  winner?: string;
-  tagline: string;
-};
+export const seedMembers: string[] = [
+  "Rahul",
+  "Priya",
+  "Arjun",
+  "Sara",
+  "Vikram",
+  "Neha",
+  "Sam",
+  "Maya",
+];
 
-export type MovieRating = {
-  id: string;
-  title: string;
-  year: number;
-  emoji: string;
-  // Group verdict, average stars out of 5.
-  avgStars: number;
-  votes: number;
-};
-
-export const activeContests: Contest[] = [
+export const seedContests: Contest[] = [
   {
     id: "fifa-2026",
     title: "FIFA World Cup 2026",
@@ -39,9 +26,6 @@ export const activeContests: Contest[] = [
     leaderTeaser: "Rahul is top of the table 🔥",
     tagline: "Predict every match. Climb the leaderboard. Talk trash.",
   },
-];
-
-export const archivedContests: Contest[] = [
   {
     id: "ipl-2025",
     title: "IPL 2025 Predictions",
@@ -53,29 +37,56 @@ export const archivedContests: Contest[] = [
   },
 ];
 
-export const movieRatings: MovieRating[] = [
+type RawMovie = Omit<Movie, "avgStars" | "votes">;
+
+const rawMovies: RawMovie[] = [
   {
     id: "dune-part-two",
     title: "Dune: Part Two",
-    year: 2024,
+    language: "English",
+    genre: ["Sci-Fi", "Adventure"],
     emoji: "🏜️",
-    avgStars: 4.5,
-    votes: 16,
+    posterUrl:
+      "https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg",
+    ratings: [
+      { name: "Rahul", stars: 5 },
+      { name: "Priya", stars: 4.5 },
+      { name: "Arjun", stars: 4 },
+      { name: "Maya", stars: 4.5 },
+    ],
   },
   {
     id: "the-batman",
     title: "The Batman",
-    year: 2022,
+    language: "English",
+    genre: ["Action", "Crime"],
     emoji: "🦇",
-    avgStars: 4,
-    votes: 14,
+    posterUrl:
+      "https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg",
+    ratings: [
+      { name: "Sam", stars: 4 },
+      { name: "Vikram", stars: 4.5 },
+      { name: "Neha", stars: 3.5 },
+    ],
   },
   {
     id: "barbie",
     title: "Barbie",
-    year: 2023,
+    language: "English",
+    genre: ["Comedy", "Fantasy"],
     emoji: "🎀",
-    avgStars: 3.5,
-    votes: 19,
+    posterUrl:
+      "https://image.tmdb.org/t/p/w500/iuFNMS8U5cb6xfzi51Dbkovj7vM.jpg",
+    ratings: [
+      { name: "Priya", stars: 4 },
+      { name: "Sara", stars: 3.5 },
+      { name: "Maya", stars: 3 },
+      { name: "Neha", stars: 4 },
+    ],
   },
 ];
+
+export const seedMovies: Movie[] = rawMovies.map((m) => ({
+  ...m,
+  ...computeStats(m.ratings),
+}));
