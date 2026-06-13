@@ -27,8 +27,8 @@ export const seedContests: Contest[] = [
     tagline: "Predict every match. Climb the leaderboard. Talk trash.",
   },
   {
-    id: "ipl-2025",
-    title: "IPL 2025 Predictions",
+    id: "ipl-2026",
+    title: "IPL 2026 Predictions",
     emoji: "🏏",
     status: "archived",
     participants: 21,
@@ -43,6 +43,7 @@ const rawMovies: RawMovie[] = [
   {
     id: "dune-part-two",
     title: "Dune: Part Two",
+    year: 2024,
     language: "English",
     genre: ["Sci-Fi", "Adventure"],
     emoji: "🏜️",
@@ -58,6 +59,7 @@ const rawMovies: RawMovie[] = [
   {
     id: "the-batman",
     title: "The Batman",
+    year: 2022,
     language: "English",
     genre: ["Action", "Crime"],
     emoji: "🦇",
@@ -72,6 +74,7 @@ const rawMovies: RawMovie[] = [
   {
     id: "barbie",
     title: "Barbie",
+    year: 2023,
     language: "English",
     genre: ["Comedy", "Fantasy"],
     emoji: "🎀",

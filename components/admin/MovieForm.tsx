@@ -22,6 +22,7 @@ export default function MovieForm({
   onCancel: () => void;
 }) {
   const [title, setTitle] = useState(movie?.title || "");
+  const [year, setYear] = useState(movie?.year ? String(movie.year) : "");
   const [language, setLanguage] = useState(movie?.language || "");
   const [genre, setGenre] = useState((movie?.genre || []).join(", "));
   const [emoji, setEmoji] = useState(movie?.emoji || "🎬");
@@ -76,6 +77,7 @@ export default function MovieForm({
 
     const payload = {
       title: title.trim(),
+      year: year.trim() ? Number(year) : undefined,
       language: language.trim(),
       genre: genre
         .split(",")
@@ -142,14 +144,22 @@ export default function MovieForm({
               value={language}
               onChange={(e) => setLanguage(e.target.value)}
               placeholder="Language"
-              className="w-1/2 rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-brand-green/60"
+              className="min-w-0 flex-1 rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-brand-green/60"
+            />
+            <input
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+              placeholder="Year"
+              inputMode="numeric"
+              maxLength={4}
+              className="w-20 rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-brand-green/60"
             />
             <input
               value={emoji}
               onChange={(e) => setEmoji(e.target.value)}
               placeholder="Emoji"
               maxLength={4}
-              className="w-1/2 rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-brand-green/60"
+              className="w-16 rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-brand-green/60"
             />
           </div>
           <input

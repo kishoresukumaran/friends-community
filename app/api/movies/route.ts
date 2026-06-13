@@ -19,6 +19,7 @@ function parseInput(body: unknown): MovieInput | null {
     : [];
   return {
     title: b.title,
+    year: Number(b.year) > 0 ? Number(b.year) : undefined,
     language: typeof b.language === "string" ? b.language : "",
     genre: Array.isArray(b.genre) ? b.genre.map(String) : [],
     posterUrl: typeof b.posterUrl === "string" ? b.posterUrl : "",

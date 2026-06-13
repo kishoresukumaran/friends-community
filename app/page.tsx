@@ -1,20 +1,27 @@
 import Hero from "@/components/Hero";
 import ActiveContestsPreview from "@/components/ActiveContestsPreview";
 import MovieRatingsPreview from "@/components/MovieRatingsPreview";
-import { loadContests, loadMovies } from "@/lib/content";
+import { loadContests, loadMembers, loadMovies } from "@/lib/content";
 
 // Always read fresh data from the DB on each request.
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const [{ active, archived }, movies] = await Promise.all([
+  const [{ active, archived }, movies, members] = await Promise.all([
     loadContests(),
     loadMovies(),
+    loadMembers(),
   ]);
+
+  const stats = {
+    friends: members.length,
+    contests: active.length + archived.length,
+    movies: movies.length,
+  };
 
   return (
     <main>
-      <Hero />
+      <Hero stats={stats} />
       <ActiveContestsPreview active={active} archived={archived} />
       <MovieRatingsPreview movies={movies} />
 

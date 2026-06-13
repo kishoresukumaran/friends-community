@@ -29,6 +29,7 @@ export interface MovieRatingEntry {
 export interface Movie {
   id: string;
   title: string;
+  year?: number;
   language: string;
   genre: string[];
   posterUrl?: string;
@@ -42,6 +43,7 @@ export interface Movie {
 // Shape accepted when creating/updating a movie (no derived fields).
 export interface MovieInput {
   title: string;
+  year?: number;
   language: string;
   genre: string[];
   posterUrl?: string;

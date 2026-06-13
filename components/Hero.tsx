@@ -1,6 +1,12 @@
 import Badge from "@/components/ui/Badge";
 
-export default function Hero() {
+export interface HeroStats {
+  friends: number;
+  contests: number;
+  movies: number;
+}
+
+export default function Hero({ stats }: { stats: HeroStats }) {
   return (
     <section
       id="home"
@@ -38,9 +44,13 @@ export default function Hero() {
 
           {/* Fun floating stat chips set the social tone without external images */}
           <div className="mt-12 grid w-full max-w-md grid-cols-3 gap-3 sm:gap-4">
-            <Stat emoji="👥" value="20+" label="Friends" />
-            <Stat emoji="🎯" value="5" label="Contests" />
-            <Stat emoji="🎬" value="40+" label="Movies rated" />
+            <Stat emoji="👥" value={String(stats.friends)} label="Friends" />
+            <Stat emoji="🎯" value={String(stats.contests)} label="Contests" />
+            <Stat
+              emoji="🎬"
+              value={String(stats.movies)}
+              label={stats.movies === 1 ? "Movie rated" : "Movies rated"}
+            />
           </div>
         </div>
       </div>

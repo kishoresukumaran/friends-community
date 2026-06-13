@@ -8,6 +8,7 @@ const COLLECTION = "movies";
 interface MovieDoc {
   _id: ObjectId;
   title: string;
+  year?: number;
   language?: string;
   genre?: string[];
   posterUrl?: string;
@@ -25,6 +26,7 @@ function mapMovie(d: MovieDoc): Movie {
   return {
     id: d._id.toString(),
     title: d.title,
+    year: d.year,
     language: d.language || "",
     genre: d.genre || [],
     posterUrl: d.posterUrl || "",
@@ -54,8 +56,10 @@ export async function getMovie(id: string): Promise<Movie | null> {
 }
 
 function normalizeInput(input: MovieInput) {
+  const year = Number(input.year);
   return {
     title: input.title.trim(),
+    year: Number.isFinite(year) && year > 0 ? Math.trunc(year) : undefined,
     language: (input.language || "").trim(),
     genre: (input.genre || []).map((g) => g.trim()).filter(Boolean),
     posterUrl: (input.posterUrl || "").trim(),

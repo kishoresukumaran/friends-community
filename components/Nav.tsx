@@ -4,10 +4,10 @@ import { useState } from "react";
 import { useAuth } from "@/components/PasswordGate";
 
 const links = [
-  { href: "#home", label: "Home" },
-  { href: "#active-contests", label: "Active Contests" },
-  { href: "#archive", label: "Archive" },
-  { href: "#movie-ratings", label: "Movie Ratings" },
+  { href: "/#home", label: "Home" },
+  { href: "/#active-contests", label: "Active Contests" },
+  { href: "/#archive", label: "Archive" },
+  { href: "/movies", label: "Movie Ratings" },
 ];
 
 export default function Nav() {
@@ -17,7 +17,7 @@ export default function Nav() {
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-ink/80 backdrop-blur-md">
       <nav className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 sm:px-6">
-        <a href="#home" className="flex items-center gap-2" onClick={() => setOpen(false)}>
+        <a href="/#home" className="flex items-center gap-2" onClick={() => setOpen(false)}>
           <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-brand-green to-grape text-lg shadow-pop">
             🤝
           </span>

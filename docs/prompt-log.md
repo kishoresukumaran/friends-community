@@ -212,3 +212,34 @@ Verified .env.local is gitignored/untracked and scanned the repo for secrets, co
 Untracked the Google_sheet CSVs (which contained members' email addresses), added Google_sheet/ to .gitignore, amended the unpushed commit to exclude them, then pushed the clean commit to GitHub.
 
 ---
+
+## [Entry #19] — 2026-06-13 09:17
+**Prompt:**
+> For the movie ratings section, for each movie, along with existing fields we hvae , I also want to have Year field where I put in the year of the movie release
+
+**Summary of action taken:**
+Added a release Year field to movies end to end: Movie type/input, DB mapper + normalizer, API validation, the admin movie form input, the public movie card display, and seed data.
+
+---
+
+## [Entry #20] — 2026-06-13 09:22
+**Prompt:**
+> are you still running the , I am seein this in cursor browser - (ERR_CONNECTION_REFUSED at localhost:3000/admin)
+
+**Summary of action taken:**
+The dev server had stopped (after the build step), causing the connection error; restarted `npm run dev` so localhost:3000 is reachable again.
+
+---
+
+## [Entry #21] — 2026-06-13 09:35
+**Prompt:**
+> Movie Ratings Analytics
+>
+> Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+>
+> To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+**Summary of action taken:**
+Built a dedicated /movies analytics page: added lib/analytics.ts compute helpers, extracted a reusable MovieCard, created the MoviesExplorer with year/genre/language filters, summary/highlights/rater-insights/breakdown/leaderboard sections, trimmed the home section to a teaser linking to /movies, and updated the nav.
+
+---

@@ -27,8 +27,8 @@ const contests = [
     tagline: "Predict every match. Climb the leaderboard. Talk trash.",
   },
   {
-    slug: "ipl-2025",
-    title: "IPL 2025 Predictions",
+    slug: "ipl-2026",
+    title: "IPL 2026 Predictions",
     emoji: "🏏",
     status: "archived",
     participants: 21,
@@ -40,6 +40,7 @@ const contests = [
 const movies = [
   {
     title: "Dune: Part Two",
+    year: 2024,
     language: "English",
     genre: ["Sci-Fi", "Adventure"],
     emoji: "🏜️",
@@ -53,6 +54,7 @@ const movies = [
   },
   {
     title: "The Batman",
+    year: 2022,
     language: "English",
     genre: ["Action", "Crime"],
     emoji: "🦇",
@@ -65,6 +67,7 @@ const movies = [
   },
   {
     title: "Barbie",
+    year: 2023,
     language: "English",
     genre: ["Comedy", "Fantasy"],
     emoji: "🎀",
@@ -108,6 +111,7 @@ try {
   await db.collection("movies").insertMany(
     movies.map((m) => ({
       title: m.title,
+      year: m.year,
       language: m.language,
       genre: m.genre,
       emoji: m.emoji,
