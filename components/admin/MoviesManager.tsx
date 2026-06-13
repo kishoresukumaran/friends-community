@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Member, Movie } from "@/lib/types";
+import { Member, Movie, MovieOptions } from "@/lib/types";
 import MovieForm from "@/components/admin/MovieForm";
 
 type Editing = { mode: "new" } | { mode: "edit"; movie: Movie } | null;
@@ -10,9 +10,11 @@ type Editing = { mode: "new" } | { mode: "edit"; movie: Movie } | null;
 export default function MoviesManager({
   initialMovies,
   members,
+  movieOptions,
 }: {
   initialMovies: Movie[];
   members: Member[];
+  movieOptions: MovieOptions;
 }) {
   const router = useRouter();
   const [editing, setEditing] = useState<Editing>(null);
@@ -58,6 +60,7 @@ export default function MoviesManager({
         <div className="mt-4">
           <MovieForm
             members={members}
+            movieOptions={movieOptions}
             onDone={done}
             onCancel={() => setEditing(null)}
           />
@@ -71,6 +74,7 @@ export default function MoviesManager({
               <MovieForm
                 members={members}
                 movie={movie}
+                movieOptions={movieOptions}
                 onDone={done}
                 onCancel={() => setEditing(null)}
               />

@@ -50,3 +50,12 @@ export interface MovieInput {
   emoji?: string;
   ratings: MovieRatingEntry[];
 }
+
+// Selectable, admin-extensible option lists for the movie form.
+export interface MovieOptions {
+  languages: string[];
+  genres: string[];
+  years: number[];
+}
+
+export type MovieOptionKind = "language" | "genre" | "year";

@@ -1,7 +1,8 @@
 import { getMembers } from "@/lib/db/members";
 import { getMovies } from "@/lib/db/movies";
+import { baseMovieOptions, getMovieOptions } from "@/lib/db/options";
 import { DB_CONFIGURED } from "@/lib/mongodb";
-import { Member, Movie } from "@/lib/types";
+import { Member, Movie, MovieOptions } from "@/lib/types";
 import MembersManager from "@/components/admin/MembersManager";
 import MoviesManager from "@/components/admin/MoviesManager";
 
@@ -10,11 +11,16 @@ export const dynamic = "force-dynamic";
 export default async function AdminPage() {
   let members: Member[] = [];
   let movies: Movie[] = [];
+  let movieOptions: MovieOptions = baseMovieOptions();
   let dbError = false;
 
   if (DB_CONFIGURED) {
     try {
-      [members, movies] = await Promise.all([getMembers(), getMovies()]);
+      [members, movies, movieOptions] = await Promise.all([
+        getMembers(),
+        getMovies(),
+        getMovieOptions(),
+      ]);
     } catch {
       dbError = true;
     }
@@ -38,7 +44,11 @@ export default async function AdminPage() {
   return (
     <div className="space-y-10">
       <MembersManager initialMembers={members} />
-      <MoviesManager initialMovies={movies} members={members} />
+      <MoviesManager
+        initialMovies={movies}
+        members={members}
+        movieOptions={movieOptions}
+      />
     </div>
   );
 }

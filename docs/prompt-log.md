@@ -243,3 +243,12 @@ The dev server had stopped (after the build step), causing the connection error;
 Built a dedicated /movies analytics page: added lib/analytics.ts compute helpers, extracted a reusable MovieCard, created the MoviesExplorer with year/genre/language filters, summary/highlights/rater-insights/breakdown/leaderboard sections, trimmed the home section to a teaser linking to /movies, and updated the nav.
 
 ---
+
+## [Entry #22] — 2026-06-13 12:19
+**Prompt:**
+> for adding new movies, make language a drop down option with values - Tamil, English, Hindi, Malayalam, Telugu, Kannada. Year as well a drop down with values - 2020..2026. Genres also a drop down using options - Comedy, Romance, Sci-Fi, Drama, Fantasy, Action. And also admin should have option to add new options to these drop downs.
+
+**Summary of action taken:**
+Converted the admin movie form's Language and Year fields to dropdowns and Genres to a multi-select chip picker, each seeded with the requested base options. Added a DB-backed, extensible option store (lib/db/options.ts + meta collection) merging base defaults, admin-added values, and values already used by movies, with an admin-only POST /api/movie-options endpoint and inline "add new" UI so admins can extend each dropdown.
+
+---

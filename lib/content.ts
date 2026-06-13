@@ -4,8 +4,9 @@
 import { getActiveContests, getArchivedContests } from "./db/contests";
 import { getMovies } from "./db/movies";
 import { getMembers } from "./db/members";
+import { baseMovieOptions, getMovieOptions } from "./db/options";
 import { seedContests, seedMembers, seedMovies } from "./data";
-import { Contest, Member, Movie } from "./types";
+import { Contest, Member, Movie, MovieOptions } from "./types";
 
 export async function loadContests(): Promise<{
   active: Contest[];
@@ -44,4 +45,12 @@ export async function loadMembers(): Promise<Member[]> {
     // fall through to seed data
   }
   return seedMembers.map((name, i) => ({ id: `seed-${i}`, name }));
+}
+
+export async function loadMovieOptions(): Promise<MovieOptions> {
+  try {
+    return await getMovieOptions();
+  } catch {
+    return baseMovieOptions();
+  }
 }
