@@ -9,12 +9,23 @@ const CONTEST_LINKS: Record<string, string> = {
   "fifa-2026": "/fifa-2026",
 };
 
+// Live numbers derived from the synced FIFA snapshot, used to override the
+// static values stored on the contest record.
+export type FifaLiveStats = {
+  playing: number;
+  played: number;
+  total: number;
+  leader: { name: string; total: number } | null;
+};
+
 export default function ActiveContestsPreview({
   active,
   archived,
+  fifaStats,
 }: {
   active: Contest[];
   archived: Contest[];
+  fifaStats?: FifaLiveStats;
 }) {
   return (
     <section id="active-contests" className="mx-auto max-w-5xl px-4 py-14 sm:px-6 sm:py-20">
@@ -31,6 +42,12 @@ export default function ActiveContestsPreview({
       <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
         {active.map((contest) => {
           const standingsHref = CONTEST_LINKS[contest.id];
+          const isFifa = contest.id === "fifa-2026" && fifaStats;
+          const leaderTeaser = isFifa
+            ? fifaStats!.leader
+              ? `${fifaStats!.leader.name} leads with ${fifaStats!.leader.total} pts`
+              : null
+            : contest.leaderTeaser;
           return (
           <Card key={contest.id} className="sm:col-span-2">
             <div className="flex items-start justify-between gap-4">
@@ -51,15 +68,25 @@ export default function ActiveContestsPreview({
             </div>
 
             <div className="mt-5 grid grid-cols-3 gap-3 text-center">
-              <MiniStat value={`${contest.participants}`} label="Playing" />
-              <MiniStat value={`${contest.daysLeft ?? "—"}`} label="Days left" />
+              <MiniStat
+                value={`${isFifa ? fifaStats!.playing : contest.participants}`}
+                label="Playing"
+              />
+              {isFifa ? (
+                <MiniStat
+                  value={`${fifaStats!.played}/${fifaStats!.total}`}
+                  label="Matches played"
+                />
+              ) : (
+                <MiniStat value={`${contest.daysLeft ?? "—"}`} label="Days left" />
+              )}
               <MiniStat value="Open" label="Predictions" tone="green" />
             </div>
 
-            {contest.leaderTeaser && (
+            {leaderTeaser && (
               <div className="mt-5 flex items-center gap-2 rounded-2xl bg-white/5 px-4 py-3 text-sm text-white/80">
                 <span className="text-lg">🥇</span>
-                <span className="font-semibold">{contest.leaderTeaser}</span>
+                <span className="font-semibold">{leaderTeaser}</span>
               </div>
             )}
 
