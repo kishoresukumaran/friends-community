@@ -1,7 +1,13 @@
+import Link from "next/link";
 import SectionHeading from "@/components/SectionHeading";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import { Contest } from "@/lib/types";
+
+// Contests that have a live standings page in the app.
+const CONTEST_LINKS: Record<string, string> = {
+  "fifa-2026": "/fifa-2026",
+};
 
 export default function ActiveContestsPreview({
   active,
@@ -23,7 +29,9 @@ export default function ActiveContestsPreview({
       />
 
       <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
-        {active.map((contest) => (
+        {active.map((contest) => {
+          const standingsHref = CONTEST_LINKS[contest.id];
+          return (
           <Card key={contest.id} className="sm:col-span-2">
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3">
@@ -55,14 +63,24 @@ export default function ActiveContestsPreview({
               </div>
             )}
 
-            <button
-              type="button"
-              className="mt-5 w-full rounded-full bg-brand-green px-5 py-3 font-semibold text-ink shadow-pop transition hover:brightness-110"
-            >
-              Make your predictions →
-            </button>
+            {standingsHref ? (
+              <Link
+                href={standingsHref}
+                className="mt-5 block w-full rounded-full bg-brand-green px-5 py-3 text-center font-semibold text-ink shadow-pop transition hover:brightness-110"
+              >
+                View live standings →
+              </Link>
+            ) : (
+              <button
+                type="button"
+                className="mt-5 w-full rounded-full bg-brand-green px-5 py-3 font-semibold text-ink shadow-pop transition hover:brightness-110"
+              >
+                Make your predictions →
+              </button>
+            )}
           </Card>
-        ))}
+          );
+        })}
 
         {/* Teaser link to the archive section */}
         {archived.map((past) => (

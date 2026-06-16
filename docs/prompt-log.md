@@ -252,3 +252,12 @@ Built a dedicated /movies analytics page: added lib/analytics.ts compute helpers
 Converted the admin movie form's Language and Year fields to dropdowns and Genres to a multi-select chip picker, each seeded with the requested base options. Added a DB-backed, extensible option store (lib/db/options.ts + meta collection) merging base defaults, admin-added values, and values already used by movies, with an admin-only POST /api/movie-options endpoint and inline "add new" UI so admins can extend each dropdown.
 
 ---
+
+## [Entry #23] — 2026-06-16 01:58
+**Prompt:**
+> FIFA 2026 Prediction Contest Tracking — implement the plan: a Google Apps Script that syncs the FIFA 2026 sheet to MongoDB every 5 minutes, plus a UI section presenting the points.
+
+**Summary of action taken:**
+Implemented FIFA 2026 contest tracking: added FIFA snapshot types, lib/db/fifa.ts + loadFifaSnapshot, a Bearer-secret POST /api/fifa/sync endpoint (with admin-only GET), a Google Apps Script (scripts/apps-script/fifa-sync.gs) + setup docs that pushes all six tabs every 5 minutes, and a full read-only /fifa-2026 dashboard (leaderboard, match results, per-player detail + pre-tournament props) linked from the active contest card and nav.
+
+---

@@ -5,8 +5,9 @@ import { getActiveContests, getArchivedContests } from "./db/contests";
 import { getMovies } from "./db/movies";
 import { getMembers } from "./db/members";
 import { baseMovieOptions, getMovieOptions } from "./db/options";
+import { getFifaSnapshot } from "./db/fifa";
 import { seedContests, seedMembers, seedMovies } from "./data";
-import { Contest, Member, Movie, MovieOptions } from "./types";
+import { Contest, FifaSnapshot, Member, Movie, MovieOptions } from "./types";
 
 export async function loadContests(): Promise<{
   active: Contest[];
@@ -52,5 +53,14 @@ export async function loadMovieOptions(): Promise<MovieOptions> {
     return await getMovieOptions();
   } catch {
     return baseMovieOptions();
+  }
+}
+
+// Returns the latest FIFA 2026 sync, or null if never synced / DB unreachable.
+export async function loadFifaSnapshot(): Promise<FifaSnapshot | null> {
+  try {
+    return await getFifaSnapshot();
+  } catch {
+    return null;
   }
 }
