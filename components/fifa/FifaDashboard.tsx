@@ -5,11 +5,13 @@ import { FifaSnapshot } from "@/lib/types";
 import FifaLeaderboard from "@/components/fifa/FifaLeaderboard";
 import FifaMatches from "@/components/fifa/FifaMatches";
 import PlayerDetail from "@/components/fifa/PlayerDetail";
+import FifaInsights from "@/components/fifa/FifaInsights";
 
-type Tab = "leaderboard" | "matches" | "players";
+type Tab = "leaderboard" | "insights" | "matches" | "players";
 
 const TABS: { key: Tab; label: string }[] = [
   { key: "leaderboard", label: "🏆 Leaderboard" },
+  { key: "insights", label: "📊 Insights" },
   { key: "matches", label: "📅 Matches" },
   { key: "players", label: "👤 Players" },
 ];
@@ -43,6 +45,7 @@ export default function FifaDashboard({
       {tab === "leaderboard" && (
         <FifaLeaderboard leaderboard={snapshot.leaderboard} />
       )}
+      {tab === "insights" && <FifaInsights snapshot={snapshot} />}
       {tab === "matches" && <FifaMatches matches={snapshot.matches} />}
       {tab === "players" && <PlayerDetail snapshot={snapshot} />}
     </div>
