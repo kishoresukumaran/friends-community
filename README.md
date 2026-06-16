@@ -64,9 +64,12 @@ app/
   admin/              # admin layout + dashboard (auth-gated)
   api/                # route handlers: admin login/logout, members, movies
 components/
-  Nav.tsx, Hero.tsx, ActiveContestsPreview.tsx, MovieRatingsPreview.tsx
+  Nav.tsx, Hero.tsx, QuickLinks.tsx
   PasswordGate.tsx    # shared group password gate
   ui/                 # Card, Badge, Stars
+  contests/           # ContestsView (active/archived)
+  fifa/               # FIFA dashboard: leaderboard, matches, players, insights
+  movies/             # MoviesExplorer + cards/analytics
   admin/              # AdminLogin, MembersManager, MoviesManager, MovieForm
 lib/
   mongodb.ts          # cached Atlas connection

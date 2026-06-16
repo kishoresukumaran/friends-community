@@ -5,9 +5,8 @@ import { useAuth } from "@/components/PasswordGate";
 
 const links = [
   { href: "/#home", label: "Home" },
-  { href: "/#active-contests", label: "Active Contests" },
-  { href: "/movies", label: "Movie Ratings" },
-  { href: "/#archive", label: "Archive" },
+  { href: "/contests", label: "Contests" },
+  { href: "/movies", label: "Movie Verdicts" },
 ];
 
 export default function Nav() {

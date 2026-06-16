@@ -29,13 +29,13 @@ export default function Hero({ stats }: { stats: HeroStats }) {
 
           <div className="mt-7 flex flex-col gap-3 sm:flex-row">
             <a
-              href="#active-contests"
+              href="/contests"
               className="rounded-full bg-brand-green px-6 py-3 text-center font-semibold text-ink shadow-pop transition hover:brightness-110"
             >
               See active contests ⚽
             </a>
             <a
-              href="#movie-ratings"
+              href="/movies"
               className="rounded-full border border-white/15 bg-white/5 px-6 py-3 text-center font-semibold text-white transition hover:bg-white/10"
             >
               Movie verdicts 🍿
