@@ -93,10 +93,16 @@ export function personalityLabel(
 
 // ── genre affinity ────────────────────────────────────────────────────────────
 
+export interface RatedMovie {
+  title: string;
+  stars: number;
+}
+
 export interface GenreAffinityRow {
   genre: string;
   avgRating: number;
   count: number;
+  movies: RatedMovie[];
 }
 
 export interface GenreAffinity {
@@ -110,21 +116,26 @@ export function personGenreAffinity(
   name: string
 ): GenreAffinity {
   const rated = ratingsFor(movies, name);
-  const map = new Map<string, { total: number; count: number }>();
+  const map = new Map<
+    string,
+    { total: number; count: number; movies: RatedMovie[] }
+  >();
   for (const r of rated) {
     for (const g of r.genre) {
       if (!g) continue;
-      const cur = map.get(g) ?? { total: 0, count: 0 };
+      const cur = map.get(g) ?? { total: 0, count: 0, movies: [] };
       cur.total += r.stars;
       cur.count += 1;
+      cur.movies.push({ title: r.title, stars: r.stars });
       map.set(g, cur);
     }
   }
   const rows: GenreAffinityRow[] = Array.from(map.entries())
-    .map(([genre, { total, count }]) => ({
+    .map(([genre, { total, count, movies: ms }]) => ({
       genre,
       avgRating: Math.round((total / count) * 10) / 10,
       count,
+      movies: ms.sort((a, b) => b.stars - a.stars),
     }))
     .sort((a, b) => b.avgRating - a.avgRating || b.count - a.count);
 
@@ -146,6 +157,7 @@ export interface LanguagePreferenceRow {
   language: string;
   avgRating: number;
   count: number;
+  movies: RatedMovie[];
 }
 
 export function languagePreference(
@@ -153,18 +165,23 @@ export function languagePreference(
   name: string
 ): LanguagePreferenceRow[] {
   const rated = ratingsFor(movies, name).filter((r) => r.language);
-  const map = new Map<string, { total: number; count: number }>();
+  const map = new Map<
+    string,
+    { total: number; count: number; movies: RatedMovie[] }
+  >();
   for (const r of rated) {
-    const cur = map.get(r.language) ?? { total: 0, count: 0 };
+    const cur = map.get(r.language) ?? { total: 0, count: 0, movies: [] };
     cur.total += r.stars;
     cur.count += 1;
+    cur.movies.push({ title: r.title, stars: r.stars });
     map.set(r.language, cur);
   }
   return Array.from(map.entries())
-    .map(([language, { total, count }]) => ({
+    .map(([language, { total, count, movies: ms }]) => ({
       language,
       avgRating: Math.round((total / count) * 10) / 10,
       count,
+      movies: ms.sort((a, b) => b.stars - a.stars),
     }))
     .sort((a, b) => b.avgRating - a.avgRating || b.count - a.count);
 }
@@ -175,6 +192,7 @@ export interface EraPreferenceRow {
   year: number;
   avgRating: number;
   count: number;
+  movies: RatedMovie[];
 }
 
 export function eraPreference(
@@ -182,19 +200,24 @@ export function eraPreference(
   name: string
 ): EraPreferenceRow[] {
   const rated = ratingsFor(movies, name).filter((r) => r.year != null);
-  const map = new Map<number, { total: number; count: number }>();
+  const map = new Map<
+    number,
+    { total: number; count: number; movies: RatedMovie[] }
+  >();
   for (const r of rated) {
     const y = r.year as number;
-    const cur = map.get(y) ?? { total: 0, count: 0 };
+    const cur = map.get(y) ?? { total: 0, count: 0, movies: [] };
     cur.total += r.stars;
     cur.count += 1;
+    cur.movies.push({ title: r.title, stars: r.stars });
     map.set(y, cur);
   }
   return Array.from(map.entries())
-    .map(([year, { total, count }]) => ({
+    .map(([year, { total, count, movies: ms }]) => ({
       year,
       avgRating: Math.round((total / count) * 10) / 10,
       count,
+      movies: ms.sort((a, b) => b.stars - a.stars),
     }))
     .sort((a, b) => a.year - b.year);
 }

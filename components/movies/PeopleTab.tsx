@@ -173,11 +173,15 @@ export default function PeopleTab({ movies }: { movies: Movie[] }) {
                   )}
               </p>
             )}
+            <p className="mt-2 text-xs text-white/40">
+              Tap a row to see the movies behind it.
+            </p>
             <BarList
               rows={genres.rows.map((r) => ({
                 label: r.genre,
                 value: r.avgRating,
                 count: r.count,
+                movies: r.movies,
               }))}
               max={maxGenreRating}
               color="bg-brand-green"
@@ -189,11 +193,15 @@ export default function PeopleTab({ movies }: { movies: Movie[] }) {
         {languages.length > 0 && (
           <div className="mt-6">
             <Eyebrow text="Ratings by language" />
+            <p className="mt-2 text-xs text-white/40">
+              Tap a row to see the movies behind it.
+            </p>
             <BarList
               rows={languages.map((r) => ({
                 label: r.language,
                 value: r.avgRating,
                 count: r.count,
+                movies: r.movies,
               }))}
               max={maxLangRating}
               color="bg-grape"
@@ -205,11 +213,15 @@ export default function PeopleTab({ movies }: { movies: Movie[] }) {
         {era.length > 1 && (
           <div className="mt-6">
             <Eyebrow text="Era preference" />
+            <p className="mt-2 text-xs text-white/40">
+              Tap a row to see the movies behind it.
+            </p>
             <BarList
               rows={era.map((r) => ({
                 label: String(r.year),
                 value: r.avgRating,
                 count: r.count,
+                movies: r.movies,
               }))}
               max={maxEraRating}
               color="bg-brand-teal"
@@ -468,37 +480,102 @@ function CardHeader({
   );
 }
 
+interface BarRowData {
+  label: string;
+  value: number;
+  count: number;
+  movies?: { title: string; stars: number }[];
+}
+
 function BarList({
   rows,
   max,
   color,
 }: {
-  rows: { label: string; value: number; count: number }[];
+  rows: BarRowData[];
   max: number;
   color: string;
 }) {
   return (
     <ul className="space-y-2.5">
       {rows.map((r) => (
-        <li key={r.label} className="flex items-center gap-3">
-          <span className="w-24 shrink-0 truncate text-sm text-white/80 sm:w-32">
-            {r.label}
-          </span>
-          <div className="h-2 flex-1 overflow-hidden rounded-full bg-white/10">
-            <div
-              className={`h-full rounded-full ${color}`}
-              style={{ width: `${(r.value / max) * 100}%` }}
-            />
-          </div>
-          <span className="w-10 shrink-0 text-right font-display text-sm font-extrabold text-white">
-            {r.value}
-          </span>
-          <span className="w-8 shrink-0 text-right text-xs text-white/40">
-            ×{r.count}
-          </span>
-        </li>
+        <BarRow key={r.label} row={r} max={max} color={color} />
       ))}
     </ul>
+  );
+}
+
+function BarRow({
+  row,
+  max,
+  color,
+}: {
+  row: BarRowData;
+  max: number;
+  color: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const expandable = !!row.movies && row.movies.length > 0;
+
+  const bar = (
+    <div className="flex items-center gap-3">
+      <span className="flex w-24 shrink-0 items-center gap-1 sm:w-32">
+        {expandable && (
+          <span
+            className={`shrink-0 text-white/35 transition-transform duration-200 ${
+              open ? "rotate-90" : ""
+            }`}
+          >
+            ›
+          </span>
+        )}
+        <span className="truncate text-sm text-white/80">{row.label}</span>
+      </span>
+      <div className="h-2 flex-1 overflow-hidden rounded-full bg-white/10">
+        <div
+          className={`h-full rounded-full ${color}`}
+          style={{ width: `${(row.value / max) * 100}%` }}
+        />
+      </div>
+      <span className="w-10 shrink-0 text-right font-display text-sm font-extrabold text-white">
+        {row.value}
+      </span>
+      <span className="w-8 shrink-0 text-right text-xs text-white/40">
+        ×{row.count}
+      </span>
+    </div>
+  );
+
+  if (!expandable) {
+    return <li>{bar}</li>;
+  }
+
+  return (
+    <li>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="w-full rounded-lg text-left transition hover:bg-white/[0.03]"
+      >
+        {bar}
+      </button>
+      {open && (
+        <ul className="mb-1 ml-3 mt-2 space-y-1 border-l border-white/10 pl-3">
+          {row.movies!.map((m) => (
+            <li
+              key={m.title}
+              className="flex items-center justify-between gap-3 text-xs"
+            >
+              <span className="min-w-0 truncate text-white/65">{m.title}</span>
+              <span className="shrink-0 font-semibold text-white/85">
+                {m.stars}★
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </li>
   );
 }
 
