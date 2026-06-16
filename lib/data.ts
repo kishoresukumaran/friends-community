@@ -42,8 +42,8 @@ export const seedContests: Contest[] = [
     emoji: "🏏",
     status: "archived",
     participants: 0,
-    winner: "Ramnatha 🏆",
-    podium: ["Ramnatha", "Shakthivel", "Bharath Krishna & Ranjith"],
+    winner: "Ramnath 🏆",
+    podium: ["Ramnath", "Shakthivel", "Bharath Krishna & Ranjith"],
     tagline: "The big one. Bragging rights for a lifetime.",
   },
   {
