@@ -6,7 +6,6 @@ import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import { Contest } from "@/lib/types";
 
-// Brief live standings for the FIFA card, derived on the server.
 export interface FifaPreview {
   playing: number;
   played: number;
@@ -14,7 +13,6 @@ export interface FifaPreview {
   top: { name: string; total: number }[];
 }
 
-// Contests that have a dedicated detail page in the app.
 const CONTEST_LINKS: Record<string, string> = {
   "fifa-2026": "/contests/fifa-2026",
 };
@@ -30,17 +28,17 @@ export default function ContestsView({
   archived: Contest[];
   fifaPreview?: FifaPreview;
 }) {
+  const [archiveOpen, setArchiveOpen] = useState(false);
+
   return (
-    <div className="space-y-5">
-      <Collapsible
-        title="Active contests"
-        count={active.length}
-        defaultOpen
-      >
+    <div className="space-y-8">
+      {/* Active — always visible */}
+      <section>
+        <SectionHeading title="Active contests" count={active.length} />
         {active.length === 0 ? (
           <Empty text="No active contests right now. Check back soon ⚽" />
         ) : (
-          <div className="space-y-4">
+          <div className="mt-4 space-y-4">
             {active.map((contest) => (
               <ActiveContestCard
                 key={contest.id}
@@ -52,67 +50,69 @@ export default function ContestsView({
             ))}
           </div>
         )}
-      </Collapsible>
+      </section>
 
-      <Collapsible title="Archived contests" count={archived.length}>
-        {archived.length === 0 ? (
-          <Empty text="No archived contests yet." />
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2">
-            {archived.map((past) => (
-              <ArchivedContestCard key={past.id} contest={past} />
-            ))}
+      {/* Archived — collapsible via plain heading toggle, no outer card */}
+      <section>
+        <div className="border-t border-white/10 pt-6">
+          <button
+            type="button"
+            onClick={() => setArchiveOpen((v) => !v)}
+            aria-expanded={archiveOpen}
+            className="flex w-full items-center gap-3 text-left"
+          >
+            <SectionHeading
+              title="Archived contests"
+              count={archived.length}
+            />
+            <span
+              className={`ml-auto shrink-0 text-white/40 transition-transform duration-300 ${
+                archiveOpen ? "rotate-180" : ""
+              }`}
+            >
+              ▾
+            </span>
+          </button>
+
+          <div
+            className={`overflow-hidden transition-[max-height] duration-300 ${
+              archiveOpen ? "max-h-[2000px]" : "max-h-0"
+            }`}
+          >
+            {archived.length === 0 ? (
+              <p className="mt-4 text-sm text-white/50">
+                No archived contests yet.
+              </p>
+            ) : (
+              <div className="mt-4 space-y-4">
+                {archived.map((past) => (
+                  <ArchivedContestCard key={past.id} contest={past} />
+                ))}
+              </div>
+            )}
           </div>
-        )}
-      </Collapsible>
+        </div>
+      </section>
     </div>
   );
 }
 
-function Collapsible({
+function SectionHeading({
   title,
   count,
-  defaultOpen = false,
-  children,
 }: {
   title: string;
   count: number;
-  defaultOpen?: boolean;
-  children: React.ReactNode;
 }) {
-  const [open, setOpen] = useState(defaultOpen);
   return (
-    <section className="rounded-3xl border border-white/10 bg-white/[0.02]">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-        className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left sm:px-6"
-      >
-        <span className="flex items-center gap-2.5">
-          <span className="font-display text-lg font-extrabold text-white sm:text-xl">
-            {title}
-          </span>
-          <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs font-semibold text-white/60">
-            {count}
-          </span>
-        </span>
-        <span
-          className={`text-white/40 transition-transform duration-300 ${
-            open ? "rotate-180" : ""
-          }`}
-        >
-          ▾
-        </span>
-      </button>
-      <div
-        className={`overflow-hidden transition-[max-height] duration-300 ${
-          open ? "max-h-[3000px]" : "max-h-0"
-        }`}
-      >
-        <div className="px-5 pb-5 sm:px-6 sm:pb-6">{children}</div>
-      </div>
-    </section>
+    <span className="flex items-center gap-2.5">
+      <span className="font-display text-lg font-extrabold text-white sm:text-xl">
+        {title}
+      </span>
+      <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs font-semibold text-white/60">
+        {count}
+      </span>
+    </span>
   );
 }
 
@@ -129,7 +129,9 @@ function ActiveContestCard({
   const inner = (
     <Card
       className={
-        href ? "transition group-hover:border-white/25 group-hover:bg-white/[0.07]" : ""
+        href
+          ? "transition group-hover:border-white/25 group-hover:bg-white/[0.07]"
+          : ""
       }
     >
       <div className="flex items-start justify-between gap-4">
@@ -162,7 +164,15 @@ function ActiveContestCard({
         ) : (
           <MiniStat value={`${contest.daysLeft ?? "—"}`} label="Days left" />
         )}
-        <MiniStat value="Open" label="Predictions" tone="green" />
+        {fifaPreview ? (
+          <MiniStat
+            value={`${fifaPreview.total - fifaPreview.played}`}
+            label="Matches left"
+            tone="green"
+          />
+        ) : (
+          <MiniStat value="Open" label="Predictions" tone="green" />
+        )}
       </div>
 
       {fifaPreview && fifaPreview.top.length > 0 ? (
@@ -198,10 +208,7 @@ function ActiveContestCard({
 
       {href && (
         <p className="mt-5 flex items-center justify-center gap-1 rounded-full bg-brand-green px-5 py-3 text-center font-semibold text-ink shadow-pop transition group-hover:brightness-110">
-          {leader
-            ? `View leaderboard, matches & insights`
-            : `View live standings`}{" "}
-          →
+          {leader ? "View leaderboard, matches & insights" : "View live standings"} →
         </p>
       )}
     </Card>

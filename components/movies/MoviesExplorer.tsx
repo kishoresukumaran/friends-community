@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { ReactNode, useMemo, useState } from "react";
 import { Movie } from "@/lib/types";
+import PeopleTab from "@/components/movies/PeopleTab";
 import {
   distinctValues,
   distinctYears,
@@ -25,6 +26,54 @@ import MovieCard from "@/components/movies/MovieCard";
 
 const EMPTY_FILTERS: Filters = { year: "", genre: "", language: "" };
 
+function applyFilters(movies: Movie[], filters: Filters): Movie[] {
+  return movies.filter((m) => {
+    if (filters.year && String(m.year) !== filters.year) return false;
+    if (filters.genre && !m.genre.includes(filters.genre)) return false;
+    if (filters.language && m.language !== filters.language) return false;
+    return true;
+  });
+}
+
+function buildHighlights(movies: Movie[]): HighlightItem[] {
+  const top = topRated(movies);
+  const watched = mostWatched(movies);
+  const gem = hiddenGem(movies);
+  const divisive = mostDivisive(movies);
+  return [
+    {
+      key: "top",
+      title: "Top Rated",
+      emoji: "🏆",
+      movie: top,
+      metric: top ? `${top.avgStars.toFixed(1)} ★ · ${top.votes} raters` : "",
+    },
+    {
+      key: "watched",
+      title: "Most Watched",
+      emoji: "👀",
+      movie: watched,
+      metric: watched ? `${watched.votes} raters` : "",
+    },
+    {
+      key: "gem",
+      title: "Hidden Gem",
+      emoji: "💎",
+      movie: gem,
+      metric: gem ? `${gem.avgStars.toFixed(1)} ★ · only ${gem.votes} raters` : "",
+    },
+    {
+      key: "divisive",
+      title: "Most Divisive",
+      emoji: "⚔️",
+      movie: divisive,
+      metric: divisive
+        ? `±${ratingSpread(divisive).toFixed(1)} spread · ${divisive.votes} raters`
+        : "",
+    },
+  ];
+}
+
 function SectionTitle({ eyebrow, title }: { eyebrow: string; title: string }) {
   return (
     <div className="mb-4">
@@ -38,134 +87,171 @@ function SectionTitle({ eyebrow, title }: { eyebrow: string; title: string }) {
   );
 }
 
-export default function MoviesExplorer({ movies }: { movies: Movie[] }) {
+interface FilterOptions {
+  years: number[];
+  genres: string[];
+  languages: string[];
+}
+
+// A section with its own independent year/genre/language filter. The filtered
+// list is handed to `children` so each section can compute its own analytics.
+function FilteredSection({
+  eyebrow,
+  title,
+  movies,
+  options,
+  children,
+}: {
+  eyebrow: string;
+  title: string;
+  movies: Movie[];
+  options: FilterOptions;
+  children: (filtered: Movie[]) => ReactNode;
+}) {
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
-
-  // Global (all-time) analytics — people and category insights.
-  const summary = useMemo(() => groupSummary(movies), [movies]);
-  const insights = useMemo(() => raterInsights(movies), [movies]);
-  const genres = useMemo(() => genreBreakdown(movies), [movies]);
-  const languages = useMemo(() => languageBreakdown(movies), [movies]);
-
-  // Filter options.
-  const years = useMemo(() => distinctYears(movies), [movies]);
-  const genreOptions = useMemo(
-    () => distinctValues(movies, (m) => m.genre),
-    [movies]
+  const filtered = useMemo(
+    () => applyFilters(movies, filters),
+    [movies, filters]
   );
-  const languageOptions = useMemo(
-    () => distinctValues(movies, (m) => (m.language ? [m.language] : [])),
-    [movies]
-  );
-
-  // Filtered set drives highlights + leaderboard + grid.
-  const filtered = useMemo(() => {
-    return movies.filter((m) => {
-      if (filters.year && String(m.year) !== filters.year) return false;
-      if (filters.genre && !m.genre.includes(filters.genre)) return false;
-      if (filters.language && m.language !== filters.language) return false;
-      return true;
-    });
-  }, [movies, filters]);
-
-  const highlights = useMemo<HighlightItem[]>(() => {
-    const top = topRated(filtered);
-    const watched = mostWatched(filtered);
-    const gem = hiddenGem(filtered);
-    const divisive = mostDivisive(filtered);
-    return [
-      {
-        key: "top",
-        title: "Top Rated",
-        emoji: "🏆",
-        movie: top,
-        metric: top ? `${top.avgStars.toFixed(1)} ★ · ${top.votes} raters` : "",
-      },
-      {
-        key: "watched",
-        title: "Most Watched",
-        emoji: "👀",
-        movie: watched,
-        metric: watched ? `${watched.votes} raters` : "",
-      },
-      {
-        key: "gem",
-        title: "Hidden Gem",
-        emoji: "💎",
-        movie: gem,
-        metric: gem ? `${gem.avgStars.toFixed(1)} ★ · only ${gem.votes} raters` : "",
-      },
-      {
-        key: "divisive",
-        title: "Most Divisive",
-        emoji: "⚔️",
-        movie: divisive,
-        metric: divisive
-          ? `±${ratingSpread(divisive).toFixed(1)} spread · ${divisive.votes} raters`
-          : "",
-      },
-    ];
-  }, [filtered]);
 
   return (
-    <div className="space-y-12">
+    <section>
+      <SectionTitle eyebrow={eyebrow} title={title} />
+      <div className="mb-4">
+        <FilterBar
+          years={options.years}
+          genres={options.genres}
+          languages={options.languages}
+          filters={filters}
+          onChange={setFilters}
+          onClear={() => setFilters(EMPTY_FILTERS)}
+          resultCount={filtered.length}
+        />
+      </div>
+      {children(filtered)}
+    </section>
+  );
+}
+
+type Tab = "analytics" | "people";
+
+const TABS: { key: Tab; label: string }[] = [
+  { key: "analytics", label: "📊 Analytics" },
+  { key: "people", label: "👥 People" },
+];
+
+export default function MoviesExplorer({ movies }: { movies: Movie[] }) {
+  const [tab, setTab] = useState<Tab>("analytics");
+
+  // Page-level overview stays all-time.
+  const summary = useMemo(() => groupSummary(movies), [movies]);
+
+  // Filter option lists are shared across every section.
+  const options = useMemo<FilterOptions>(
+    () => ({
+      years: distinctYears(movies),
+      genres: distinctValues(movies, (m) => m.genre),
+      languages: distinctValues(movies, (m) => (m.language ? [m.language] : [])),
+    }),
+    [movies]
+  );
+
+  return (
+    <div>
+      {/* Tab bar */}
+      <div className="mb-8 flex flex-wrap gap-1.5 rounded-full bg-white/5 p-1.5 sm:w-fit">
+        {TABS.map((t) => (
+          <button
+            key={t.key}
+            type="button"
+            onClick={() => setTab(t.key)}
+            className={`flex-1 whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition sm:flex-none ${
+              tab === t.key
+                ? "bg-brand-green text-ink"
+                : "text-white/60 hover:text-white"
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {tab === "people" && <PeopleTab movies={movies} />}
+
+      {tab === "analytics" && <div className="space-y-12">
       {/* Group at a glance (all-time) */}
       <section>
         <SectionTitle eyebrow="All-time" title="Group at a glance" />
         <SummaryCards summary={summary} />
       </section>
 
-      {/* Filterable highlights */}
-      <section>
-        <SectionTitle eyebrow="Standouts" title="Highlights" />
-        <div className="mb-4">
-          <FilterBar
-            years={years}
-            genres={genreOptions}
-            languages={languageOptions}
-            filters={filters}
-            onChange={setFilters}
-            onClear={() => setFilters(EMPTY_FILTERS)}
-            resultCount={filtered.length}
-          />
-        </div>
-        <Highlights items={highlights} />
-      </section>
+      {/* Standouts */}
+      <FilteredSection
+        eyebrow="Standouts"
+        title="Highlights"
+        movies={movies}
+        options={options}
+      >
+        {(filtered) => <Highlights items={buildHighlights(filtered)} />}
+      </FilteredSection>
 
-      {/* Rater insights (all-time) */}
-      <section>
-        <SectionTitle eyebrow="The people" title="Rater insights" />
-        <RaterInsights insights={insights} />
-      </section>
+      {/* The people */}
+      <FilteredSection
+        eyebrow="The people"
+        title="Rater insights"
+        movies={movies}
+        options={options}
+      >
+        {(filtered) => <RaterInsights insights={raterInsights(filtered)} />}
+      </FilteredSection>
 
-      {/* Genre + language breakdown (all-time) */}
-      <section>
-        <SectionTitle eyebrow="By category" title="Breakdown" />
-        <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
-          <Breakdown title="Genres" rows={genres} />
-          <Breakdown title="Languages" rows={languages} />
-        </div>
-      </section>
-
-      {/* Leaderboard (filtered) */}
-      <section>
-        <SectionTitle eyebrow="Ranked" title="Leaderboard" />
-        <Leaderboard movies={filtered} />
-      </section>
-
-      {/* Full grid (filtered) */}
-      <section>
-        <SectionTitle eyebrow="Browse" title="All movies" />
-        {filtered.length === 0 ? (
-          <p className="text-sm text-white/40">No movies match these filters.</p>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 sm:gap-6">
-            {filtered.map((movie) => (
-              <MovieCard key={movie.id} movie={movie} />
-            ))}
+      {/* By category */}
+      <FilteredSection
+        eyebrow="By category"
+        title="Breakdown"
+        movies={movies}
+        options={options}
+      >
+        {(filtered) => (
+          <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
+            <Breakdown title="Genres" rows={genreBreakdown(filtered)} />
+            <Breakdown title="Languages" rows={languageBreakdown(filtered)} />
           </div>
         )}
-      </section>
+      </FilteredSection>
+
+      {/* Ranked */}
+      <FilteredSection
+        eyebrow="Ranked"
+        title="Leaderboard"
+        movies={movies}
+        options={options}
+      >
+        {(filtered) => <Leaderboard movies={filtered} />}
+      </FilteredSection>
+
+      {/* Browse */}
+      <FilteredSection
+        eyebrow="Browse"
+        title="All movies"
+        movies={movies}
+        options={options}
+      >
+        {(filtered) =>
+          filtered.length === 0 ? (
+            <p className="text-sm text-white/40">
+              No movies match these filters.
+            </p>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 sm:gap-6">
+              {filtered.map((movie) => (
+                <MovieCard key={movie.id} movie={movie} />
+              ))}
+            </div>
+          )
+        }
+      </FilteredSection>
+      </div>}
     </div>
   );
 }

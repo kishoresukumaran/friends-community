@@ -9,7 +9,9 @@ import {
   contrarianWins,
   formTable,
   headToHead,
+  matchPickStats,
   mostDivisiveMatch,
+  norm,
   titleRace,
   wisdomOfCrowd,
 } from "@/lib/fifa-analytics";
@@ -25,6 +27,13 @@ export default function FifaInsights({ snapshot }: { snapshot: FifaSnapshot }) {
   const contrarians = useMemo(() => contrarianWins(snapshot), [snapshot]);
   const divisive = useMemo(() => mostDivisiveMatch(snapshot), [snapshot]);
   const wisdom = useMemo(() => wisdomOfCrowd(snapshot), [snapshot]);
+  const crowdCorrect = useMemo(
+    () =>
+      matchPickStats(snapshot)
+        .filter((s) => s.decided && s.majorityCorrect)
+        .sort((a, b) => b.matchNo - a.matchNo),
+    [snapshot]
+  );
   const survival = useMemo(() => championSurvival(snapshot), [snapshot]);
 
   return (
@@ -37,6 +46,7 @@ export default function FifaInsights({ snapshot }: { snapshot: FifaSnapshot }) {
         contrarians={contrarians}
         divisive={divisive}
         wisdom={wisdom}
+        crowdCorrect={crowdCorrect}
       />
       <ChampionSurvivalCard survival={survival} />
       <HeadToHeadCard snapshot={snapshot} />
@@ -265,39 +275,87 @@ function CrowdCard({
   contrarians,
   divisive,
   wisdom,
+  crowdCorrect,
 }: {
   contrarians: ReturnType<typeof contrarianWins>;
   divisive: ReturnType<typeof mostDivisiveMatch>;
   wisdom: ReturnType<typeof wisdomOfCrowd>;
+  crowdCorrect: ReturnType<typeof matchPickStats>;
 }) {
+  const [open, setOpen] = useState(false);
+  const expandable = crowdCorrect.length > 0;
   return (
     <Section
       title="🧩 Crowd vs contrarian"
       subtitle="Where the group agreed, split, and got it wrong"
     >
-      {/* Wisdom meter */}
-      <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-        <div className="flex items-baseline justify-between">
-          <span className="text-sm font-semibold text-white/80">
-            Wisdom of the crowd
-          </span>
-          <span className="font-display text-sm font-extrabold text-white">
+      {/* Wisdom meter — click to expand the matches the crowd nailed */}
+      <div className="rounded-xl border border-white/10 bg-white/[0.03]">
+        <button
+          type="button"
+          onClick={() => expandable && setOpen((v) => !v)}
+          aria-expanded={open}
+          disabled={!expandable}
+          className={`w-full p-3 text-left ${
+            expandable ? "cursor-pointer" : "cursor-default"
+          }`}
+        >
+          <div className="flex items-baseline justify-between gap-2">
+            <span className="text-sm font-semibold text-white/80">
+              Wisdom of the crowd
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="font-display text-sm font-extrabold text-white">
+                {wisdom.total === 0 ? "—" : `${Math.round(wisdom.pct * 100)}%`}
+              </span>
+              {expandable && (
+                <span
+                  className={`text-xs text-white/40 transition-transform duration-300 ${
+                    open ? "rotate-180" : ""
+                  }`}
+                >
+                  ▾
+                </span>
+              )}
+            </span>
+          </div>
+          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
+            <div
+              className="h-full rounded-full bg-grape"
+              style={{ width: `${Math.round(wisdom.pct * 100)}%` }}
+            />
+          </div>
+          <p className="mt-1.5 text-xs text-white/45">
             {wisdom.total === 0
-              ? "—"
-              : `${Math.round(wisdom.pct * 100)}%`}
-          </span>
-        </div>
-        <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
-          <div
-            className="h-full rounded-full bg-grape"
-            style={{ width: `${Math.round(wisdom.pct * 100)}%` }}
-          />
-        </div>
-        <p className="mt-1.5 text-xs text-white/45">
-          {wisdom.total === 0
-            ? "No decided matches yet."
-            : `The majority pick was right in ${wisdom.correct} of ${wisdom.total} decided matches.`}
-        </p>
+              ? "No decided matches yet."
+              : `The majority pick was right in ${wisdom.correct} of ${wisdom.total} decided matches.${
+                  expandable ? (open ? "" : " Tap to see them.") : ""
+                }`}
+          </p>
+        </button>
+        {open && expandable && (
+          <ul className="border-t border-white/10 px-3 py-2">
+            {crowdCorrect.map((s) => (
+              <li
+                key={s.matchNo}
+                className="flex items-center justify-between gap-2 py-1.5 text-sm"
+              >
+                <span className="min-w-0 truncate text-white/80">
+                  <span className="text-white/40">#{s.matchNo}</span>{" "}
+                  <span className="text-brand-green">{s.winner}</span>
+                  <span className="text-white/40">
+                    {" "}
+                    over {norm(s.winner) === norm(s.team1) ? s.team2 : s.team1}
+                  </span>
+                </span>
+                <span className="shrink-0 text-xs text-white/45">
+                  {s.majorityCount}/{s.total} ({Math.round(s.majorityPct * 100)}
+                  %)
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       {/* Most divisive */}
@@ -349,30 +407,54 @@ function CrowdCard({
         ) : (
           <ul className="space-y-2">
             {contrarians.slice(0, 5).map((c) => (
-              <li
-                key={c.matchNo}
-                className="rounded-xl bg-white/5 px-3 py-2 text-sm"
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="truncate text-white/80">
-                    <span className="text-white/40">#{c.matchNo}</span> {c.label}{" "}
-                    → <span className="text-brand-green">{c.winner}</span>
-                  </span>
-                  <span className="shrink-0 text-xs text-white/45">
-                    {c.backerCount}/{c.total} called it
-                  </span>
-                </div>
-                {c.backers.length > 0 && (
-                  <p className="mt-0.5 truncate text-xs text-white/55">
-                    {c.backers.join(", ")}
-                  </p>
-                )}
-              </li>
+              <ContrarianRow key={c.matchNo} c={c} />
             ))}
           </ul>
         )}
       </div>
     </Section>
+  );
+}
+
+function ContrarianRow({
+  c,
+}: {
+  c: ReturnType<typeof contrarianWins>[number];
+}) {
+  const [open, setOpen] = useState(false);
+  const canExpand = c.backers.length > 0;
+  return (
+    <li className="overflow-hidden rounded-xl bg-white/5 text-sm">
+      <button
+        type="button"
+        onClick={() => canExpand && setOpen((v) => !v)}
+        aria-expanded={open}
+        disabled={!canExpand}
+        className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left"
+      >
+        <span className="truncate text-white/80">
+          <span className="text-white/40">#{c.matchNo}</span> {c.label} →{" "}
+          <span className="text-brand-green">{c.winner}</span>
+        </span>
+        <span className="flex shrink-0 items-center gap-1.5 text-xs text-white/45">
+          {c.backerCount}/{c.total} called it
+          {canExpand && (
+            <span
+              className={`transition-transform duration-300 ${
+                open ? "rotate-180" : ""
+              }`}
+            >
+              ▾
+            </span>
+          )}
+        </span>
+      </button>
+      {open && canExpand && (
+        <p className="border-t border-white/10 px-3 py-2 text-xs text-white/70">
+          {c.backers.join(", ")}
+        </p>
+      )}
+    </li>
   );
 }
 
@@ -400,38 +482,70 @@ function ChampionSurvivalCard({
           : "Title bets — eliminations show once knockouts begin"
       }
     >
-      <ul className="space-y-2.5">
+      <ul className="space-y-1.5">
         {survival.rows.map((r) => (
-          <li key={r.team} className="flex items-center gap-3">
-            <span
-              className={`w-24 shrink-0 truncate font-semibold sm:w-32 ${
-                r.eliminated
-                  ? "text-white/35 line-through"
-                  : "text-white"
-              }`}
-            >
-              {r.team}
-            </span>
-            <div className="h-2 flex-1 overflow-hidden rounded-full bg-white/10">
-              <div
-                className={`h-full rounded-full ${
-                  r.eliminated ? "bg-white/20" : "bg-gold"
-                }`}
-                style={{ width: `${Math.max(6, (r.count / max) * 100)}%` }}
-              />
-            </div>
-            <span className="w-8 shrink-0 text-right text-sm text-white/60">
-              {r.count}
-            </span>
-            {r.eliminated && (
-              <span className="shrink-0 text-xs font-semibold text-sunset">
-                OUT
-              </span>
-            )}
-          </li>
+          <ChampionRow key={r.team} r={r} max={max} />
         ))}
       </ul>
     </Section>
+  );
+}
+
+function ChampionRow({
+  r,
+  max,
+}: {
+  r: ReturnType<typeof championSurvival>["rows"][number];
+  max: number;
+}) {
+  const [open, setOpen] = useState(false);
+  const canExpand = r.backers.length > 0;
+  return (
+    <li className="overflow-hidden rounded-xl">
+      <button
+        type="button"
+        onClick={() => canExpand && setOpen((v) => !v)}
+        aria-expanded={open}
+        disabled={!canExpand}
+        className="flex w-full items-center gap-3 py-1 text-left"
+      >
+        <span
+          className={`w-24 shrink-0 truncate font-semibold sm:w-32 ${
+            r.eliminated ? "text-white/35 line-through" : "text-white"
+          }`}
+        >
+          {r.team}
+        </span>
+        <div className="h-2 flex-1 overflow-hidden rounded-full bg-white/10">
+          <div
+            className={`h-full rounded-full ${
+              r.eliminated ? "bg-white/20" : "bg-gold"
+            }`}
+            style={{ width: `${Math.max(6, (r.count / max) * 100)}%` }}
+          />
+        </div>
+        <span className="w-8 shrink-0 text-right text-sm text-white/60">
+          {r.count}
+        </span>
+        {r.eliminated && (
+          <span className="shrink-0 text-xs font-semibold text-sunset">OUT</span>
+        )}
+        {canExpand && (
+          <span
+            className={`shrink-0 text-xs text-white/40 transition-transform duration-300 ${
+              open ? "rotate-180" : ""
+            }`}
+          >
+            ▾
+          </span>
+        )}
+      </button>
+      {open && canExpand && (
+        <p className="px-1 pb-2 pl-1 text-xs text-white/60">
+          {r.backers.join(", ")}
+        </p>
+      )}
+    </li>
   );
 }
 

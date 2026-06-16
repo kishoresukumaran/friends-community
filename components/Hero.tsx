@@ -27,23 +27,8 @@ export default function Hero({ stats }: { stats: HeroStats }) {
             takes. 🏆
           </p>
 
-          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-            <a
-              href="/contests"
-              className="rounded-full bg-brand-green px-6 py-3 text-center font-semibold text-ink shadow-pop transition hover:brightness-110"
-            >
-              See active contests ⚽
-            </a>
-            <a
-              href="/movies"
-              className="rounded-full border border-white/15 bg-white/5 px-6 py-3 text-center font-semibold text-white transition hover:bg-white/10"
-            >
-              Movie verdicts 🍿
-            </a>
-          </div>
-
           {/* Fun floating stat chips set the social tone without external images */}
-          <div className="mt-12 grid w-full max-w-md grid-cols-3 gap-3 sm:gap-4">
+          <div className="mt-10 grid w-full max-w-md grid-cols-3 gap-3 sm:gap-4">
             <Stat emoji="👥" value={String(stats.friends)} label="Friends" />
             <Stat emoji="🎯" value={String(stats.contests)} label="Contests" />
             <Stat
