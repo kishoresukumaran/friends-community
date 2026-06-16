@@ -7,6 +7,7 @@ const links = [
   { href: "/#home", label: "Home" },
   { href: "/contests", label: "Contests" },
   { href: "/movies", label: "Movie Verdicts" },
+  { href: "/fitness", label: "Fitness" },
 ];
 
 export default function Nav() {

@@ -37,6 +37,14 @@ export default function QuickLinks({ stats }: { stats: QuickLinkStats }) {
             stats.moviesRated === 1 ? "movie" : "movies"
           } rated`}
         />
+        <QuickLinkCard
+          href="/fitness"
+          emoji="💪"
+          title="Fitness Challenges"
+          blurb="Monthly challenges, distances, and who actually showed up."
+          stat="Coming soon"
+          className="sm:col-span-2"
+        />
       </div>
     </section>
   );
@@ -48,17 +56,19 @@ function QuickLinkCard({
   title,
   blurb,
   stat,
+  className = "",
 }: {
   href: string;
   emoji: string;
   title: string;
   blurb: string;
   stat: string;
+  className?: string;
 }) {
   return (
     <Link
       href={href}
-      className="group flex items-center gap-4 rounded-3xl border border-white/10 bg-white/[0.04] p-5 shadow-card backdrop-blur-sm transition hover:border-white/25 hover:bg-white/[0.07] sm:p-6"
+      className={`group flex items-center gap-4 rounded-3xl border border-white/10 bg-white/[0.04] p-5 shadow-card backdrop-blur-sm transition hover:border-white/25 hover:bg-white/[0.07] sm:p-6 ${className}`}
     >
       <span className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-brand-teal to-brand-green text-3xl shadow-pop">
         {emoji}
