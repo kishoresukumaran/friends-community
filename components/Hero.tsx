@@ -39,6 +39,12 @@ export default function Hero({ stats }: { stats: HeroStats }) {
           </div>
         </div>
       </div>
+
+      {/* Smoothly dissolve the aurora into the page background to avoid a hard edge */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-ink"
+      />
     </section>
   );
 }
