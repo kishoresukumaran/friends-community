@@ -225,13 +225,79 @@ export function contrarianPicks(
     .slice(0, n);
 }
 
+// ── group taste ───────────────────────────────────────────────────────────────
+
+export interface GroupTasteRow {
+  label: string;
+  average: number;
+  count: number;
+}
+
+export interface GroupTaste {
+  rows: GroupTasteRow[];
+  top: GroupTasteRow | null;
+}
+
+// Group-level taste for a dimension. Each rated movie contributes its group
+// average once per key, so the average reflects how the whole crew tends to
+// rate that genre/language/era. The headline pick prefers keys with >= 2
+// movies so a single outlier does not win.
+function buildGroupTaste(
+  movies: Movie[],
+  keyFn: (m: Movie) => string[]
+): GroupTaste {
+  const map = new Map<string, { total: number; count: number }>();
+  for (const m of movies) {
+    if (m.votes <= 0) continue;
+    for (const key of keyFn(m)) {
+      if (!key) continue;
+      const cur = map.get(key) ?? { total: 0, count: 0 };
+      cur.total += m.avgStars;
+      cur.count += 1;
+      map.set(key, cur);
+    }
+  }
+  const rows: GroupTasteRow[] = Array.from(map.entries())
+    .map(([label, { total, count }]) => ({
+      label,
+      average: Math.round((total / count) * 10) / 10,
+      count,
+    }))
+    .sort((a, b) => b.average - a.average || b.count - a.count);
+  const qualified = rows.filter((r) => r.count >= 2);
+  const top = qualified[0] ?? rows[0] ?? null;
+  return { rows, top };
+}
+
+export function groupGenreTaste(movies: Movie[]): GroupTaste {
+  return buildGroupTaste(movies, (m) => m.genre ?? []);
+}
+
+export function groupLanguageTaste(movies: Movie[]): GroupTaste {
+  return buildGroupTaste(movies, (m) => (m.language ? [m.language] : []));
+}
+
+export function groupYearTaste(movies: Movie[]): GroupTaste {
+  return buildGroupTaste(movies, (m) =>
+    m.year != null ? [String(m.year)] : []
+  );
+}
+
 // ── taste twins ───────────────────────────────────────────────────────────────
+
+export interface TasteTwinShared {
+  title: string;
+  starsA: number;
+  starsB: number;
+  diff: number; // |starsA - starsB|
+}
 
 export interface TasteTwinPair {
   nameA: string;
   nameB: string;
   correlation: number; // Pearson -1..1
   sharedCount: number;
+  shared: TasteTwinShared[];
 }
 
 function pearson(xs: number[], ys: number[]): number {
@@ -258,6 +324,9 @@ export function tasteTwins(
   minShared = 3
 ): TasteTwinPair[] {
   const names = allRaterNames(movies);
+  const titleById = new Map<string, string>();
+  for (const m of movies) titleById.set(m.id, m.title);
+
   // Build a map: name -> { movieId -> stars }
   const ratingMap = new Map<string, Map<string, number>>();
   for (const name of names) {
@@ -274,17 +343,32 @@ export function tasteTwins(
     for (let j = i + 1; j < names.length; j++) {
       const a = ratingMap.get(names[i])!;
       const b = ratingMap.get(names[j])!;
-      const shared = Array.from(a.keys()).filter((id) => b.has(id));
-      if (shared.length < minShared) continue;
-      const xs = shared.map((id) => a.get(id)!);
-      const ys = shared.map((id) => b.get(id)!);
+      const sharedIds = Array.from(a.keys()).filter((id) => b.has(id));
+      if (sharedIds.length < minShared) continue;
+      const xs = sharedIds.map((id) => a.get(id)!);
+      const ys = sharedIds.map((id) => b.get(id)!);
+      const shared: TasteTwinShared[] = sharedIds
+        .map((id) => {
+          const starsA = a.get(id)!;
+          const starsB = b.get(id)!;
+          return {
+            title: titleById.get(id) ?? "Unknown",
+            starsA,
+            starsB,
+            diff: Math.round(Math.abs(starsA - starsB) * 10) / 10,
+          };
+        })
+        .sort((x, y) => x.diff - y.diff || x.title.localeCompare(y.title));
       pairs.push({
         nameA: names[i],
         nameB: names[j],
         correlation: pearson(xs, ys),
-        sharedCount: shared.length,
+        sharedCount: sharedIds.length,
+        shared,
       });
     }
   }
-  return pairs.sort((a, b) => b.correlation - a.correlation);
+  return pairs.sort(
+    (a, b) => b.correlation - a.correlation || b.sharedCount - a.sharedCount
+  );
 }
