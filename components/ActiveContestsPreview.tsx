@@ -110,23 +110,36 @@ export default function ActiveContestsPreview({
         })}
 
         {/* Teaser link to the archive section */}
-        {archived.map((past) => (
-          <Card key={past.id} className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <span className="grid h-11 w-11 place-items-center rounded-xl bg-white/5 text-2xl">
-                {past.emoji}
-              </span>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-white/40">
-                  From the archive
-                </p>
-                <p className="font-semibold text-white">{past.title}</p>
-                <p className="text-sm text-white/60">Champion: {past.winner}</p>
+        {archived.map((past) => {
+          const medals = ["🥇", "🥈", "🥉"];
+          return (
+            <Card key={past.id} className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <span className="grid h-11 w-11 place-items-center rounded-xl bg-white/5 text-2xl">
+                  {past.emoji}
+                </span>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-white/40">
+                    From the archive
+                  </p>
+                  <p className="font-semibold text-white">{past.title}</p>
+                  {past.podium && past.podium.length > 0 ? (
+                    <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-sm text-white/60">
+                      {past.podium.slice(0, 3).map((name, i) => (
+                        <span key={name}>
+                          <span>{medals[i]}</span> {name}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-white/60">Champion: {past.winner}</p>
+                  )}
+                </div>
               </div>
-            </div>
-            <Badge tone="gold">Wrapped</Badge>
-          </Card>
-        ))}
+              <Badge tone="gold">Wrapped</Badge>
+            </Card>
+          );
+        })}
 
         {/* Placeholder for the future full Archive section */}
         <div

@@ -13,6 +13,7 @@ interface ContestDoc {
   daysLeft?: number;
   leaderTeaser?: string;
   winner?: string;
+  podium?: string[];
   tagline: string;
 }
 
@@ -26,6 +27,7 @@ function mapContest(d: ContestDoc): Contest {
     daysLeft: d.daysLeft,
     leaderTeaser: d.leaderTeaser,
     winner: d.winner,
+    podium: Array.isArray(d.podium) ? d.podium : undefined,
     tagline: d.tagline,
   };
 }

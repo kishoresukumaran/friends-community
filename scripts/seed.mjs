@@ -32,7 +32,8 @@ const contests = [
     emoji: "🏏",
     status: "archived",
     participants: 21,
-    winner: "Priya 🏆",
+    winner: "Haroon 🏆",
+    podium: ["Haroon", "Kishore", "Vijay"],
     tagline: "62 matches, countless arguments, one champion.",
   },
 ];

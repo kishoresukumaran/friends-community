@@ -75,7 +75,6 @@ export default function FifaMatches({ matches }: { matches: FifaMatch[] }) {
                   </p>
                   {m.location && (
                     <p className="mt-0.5 truncate text-xs text-white/45">
-                      {m.dateTime ? `${m.dateTime} · ` : ""}
                       {m.location}
                     </p>
                   )}

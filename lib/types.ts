@@ -11,6 +11,8 @@ export interface Contest {
   daysLeft?: number;
   leaderTeaser?: string;
   winner?: string;
+  // Final standings for archived contests, in order: [1st, 2nd, 3rd, ...].
+  podium?: string[];
   tagline: string;
 }
 

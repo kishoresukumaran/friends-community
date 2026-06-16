@@ -6,7 +6,6 @@ import { useAuth } from "@/components/PasswordGate";
 const links = [
   { href: "/#home", label: "Home" },
   { href: "/#active-contests", label: "Active Contests" },
-  { href: "/fifa-2026", label: "FIFA 2026" },
   { href: "/movies", label: "Movie Ratings" },
   { href: "/#archive", label: "Archive" },
 ];
