@@ -43,7 +43,10 @@ export default function FifaDashboard({
       </div>
 
       {tab === "leaderboard" && (
-        <FifaLeaderboard leaderboard={snapshot.leaderboard} />
+        <FifaLeaderboard
+          leaderboard={snapshot.leaderboard}
+          syncedAt={snapshot.syncedAt}
+        />
       )}
       {tab === "insights" && <FifaInsights snapshot={snapshot} />}
       {tab === "matches" && <FifaMatches matches={snapshot.matches} />}
