@@ -1,10 +1,17 @@
 import Link from "next/link";
+import { loadFitnessMonths } from "@/lib/content";
+import FitnessView from "@/components/fitness/FitnessView";
+
+export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "Fitness Challenges — Friends Community",
 };
 
-export default function FitnessPage() {
+export default async function FitnessPage() {
+  const months = await loadFitnessMonths();
+  const hasData = months.some((m) => m.entries.length > 0);
+
   return (
     <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
       <div className="mb-8">
@@ -18,11 +25,20 @@ export default function FitnessPage() {
           Fitness <span className="text-gradient">Challenges</span> 💪
         </h1>
         <p className="mt-2 text-white/60">
-          Monthly challenges, leaderboards, and bragging rights — soon.
+          {hasData
+            ? "Monthly distances, leaderboards, and all-time bragging rights."
+            : "Monthly challenges, leaderboards, and bragging rights — soon."}
         </p>
       </div>
 
-      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] p-8 text-center shadow-card sm:p-14">
+      {hasData ? <FitnessView months={months} /> : <ComingSoon />}
+    </main>
+  );
+}
+
+function ComingSoon() {
+  return (
+    <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] p-8 text-center shadow-card sm:p-14">
         <span className="pointer-events-none absolute -right-6 -top-6 text-[8rem] opacity-10 sm:text-[12rem]">
           🏃
         </span>
@@ -64,8 +80,7 @@ export default function FitnessPage() {
             . 😅
           </p>
         </div>
-      </div>
-    </main>
+    </div>
   );
 }
 

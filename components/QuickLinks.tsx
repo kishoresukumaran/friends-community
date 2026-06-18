@@ -5,6 +5,7 @@ export interface QuickLinkStats {
   contestsTotal: number;
   contestsLive: number;
   moviesRated: number;
+  fitnessLabel: string;
 }
 
 export default function QuickLinks({ stats }: { stats: QuickLinkStats }) {
@@ -42,7 +43,7 @@ export default function QuickLinks({ stats }: { stats: QuickLinkStats }) {
           emoji="💪"
           title="Fitness Challenges"
           blurb="Monthly challenges, distances, and who actually showed up."
-          stat="Coming soon"
+          stat={stats.fitnessLabel}
           className="sm:col-span-2"
         />
       </div>

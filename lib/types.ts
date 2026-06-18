@@ -62,6 +62,28 @@ export interface MovieOptions {
 
 export type MovieOptionKind = "language" | "genre" | "year";
 
+// --- Fitness challenges -------------------------------------------------
+// One document per month with embedded per-member distances (km).
+
+export interface FitnessEntry {
+  memberId?: string;
+  name: string;
+  distanceKm: number;
+}
+
+export interface FitnessMonth {
+  id: string; // `${year}-${MM}`, e.g. "2026-06"
+  year: number;
+  month: number; // 1-12
+  entries: FitnessEntry[];
+}
+
+export interface FitnessMonthInput {
+  year: number;
+  month: number;
+  entries: FitnessEntry[];
+}
+
 // --- FIFA 2026 prediction contest ---------------------------------------
 // The Google Sheet is the scoring engine; an Apps Script pushes these
 // snapshots into MongoDB. The app stores and displays them read-only.

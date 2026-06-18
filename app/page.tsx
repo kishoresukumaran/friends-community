@@ -1,16 +1,23 @@
 import Hero from "@/components/Hero";
 import QuickLinks from "@/components/QuickLinks";
-import { loadContests, loadMembers, loadMovies } from "@/lib/content";
+import {
+  loadContests,
+  loadFitnessMonths,
+  loadMembers,
+  loadMovies,
+} from "@/lib/content";
 
 // Always read fresh data from the DB on each request.
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const [{ active, archived }, movies, members] = await Promise.all([
-    loadContests(),
-    loadMovies(),
-    loadMembers(),
-  ]);
+  const [{ active, archived }, movies, members, fitnessMonths] =
+    await Promise.all([
+      loadContests(),
+      loadMovies(),
+      loadMembers(),
+      loadFitnessMonths(),
+    ]);
 
   const stats = {
     friends: members.length,
@@ -18,10 +25,16 @@ export default async function Home() {
     movies: movies.length,
   };
 
+  const latestFitness = fitnessMonths.find((m) => m.entries.length > 0);
+  const fitnessLabel = latestFitness?.entries[0]
+    ? `🥇 ${latestFitness.entries[0].name} leads`
+    : "Coming soon";
+
   const quickLinkStats = {
     contestsTotal: active.length + archived.length,
     contestsLive: active.length,
     moviesRated: movies.length,
+    fitnessLabel,
   };
 
   return (

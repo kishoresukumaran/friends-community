@@ -6,8 +6,16 @@ import { getMovies } from "./db/movies";
 import { getMembers } from "./db/members";
 import { baseMovieOptions, getMovieOptions } from "./db/options";
 import { getFifaSnapshot } from "./db/fifa";
+import { getFitnessMonths } from "./db/fitness";
 import { seedContests, seedMembers, seedMovies } from "./data";
-import { Contest, FifaSnapshot, Member, Movie, MovieOptions } from "./types";
+import {
+  Contest,
+  FifaSnapshot,
+  FitnessMonth,
+  Member,
+  Movie,
+  MovieOptions,
+} from "./types";
 
 export async function loadContests(): Promise<{
   active: Contest[];
@@ -62,5 +70,14 @@ export async function loadFifaSnapshot(): Promise<FifaSnapshot | null> {
     return await getFifaSnapshot();
   } catch {
     return null;
+  }
+}
+
+// Returns recorded fitness months (newest first), or [] if none / DB unreachable.
+export async function loadFitnessMonths(): Promise<FitnessMonth[]> {
+  try {
+    return await getFitnessMonths();
+  } catch {
+    return [];
   }
 }
